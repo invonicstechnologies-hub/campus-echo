@@ -17,17 +17,10 @@ export function ReactionBar({ initialScore, comments, reposts, compact }: Props)
   const [vote, setVote] = useState<ActionState>(null);
   const [reposted, setReposted] = useState(false);
 
-  const adjust = (target: ActionState) => {
-    if (target === "up") return vote === "up" ? -1 : vote === "down" ? 2 : 1;
-    if (target === "down") return vote === "down" ? 1 : vote === "up" ? -2 : -1;
-    return 0;
-  };
-
   const score = initialScore + (vote === "up" ? 1 : vote === "down" ? -1 : 0);
 
   const onVote = (target: Exclude<ActionState, null>) => {
     setVote((v) => (v === target ? null : target));
-    void adjust;
   };
 
   return (
