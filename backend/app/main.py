@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import auth, posts, petitions, flags, moderation
+from app.api.routes import auth, posts, petitions, flags, moderation, admin
 from app.middleware.request_id import RequestIDMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
 
@@ -29,6 +29,7 @@ app.include_router(posts.router)
 app.include_router(petitions.router)
 app.include_router(flags.router)
 app.include_router(moderation.router)
+app.include_router(admin.router)
 
 @app.get("/health")
 async def health_check():

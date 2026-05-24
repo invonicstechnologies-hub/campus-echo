@@ -11,7 +11,6 @@ export async function customFetch<T>(
   const method = (options.method ?? 'GET').toUpperCase();
 
   const headers = new Headers(options.headers);
-  headers.set('Content-Type', 'application/json');
 
   // Attach CSRF header on all state-changing requests
   if (STATE_CHANGING_METHODS.has(method)) {

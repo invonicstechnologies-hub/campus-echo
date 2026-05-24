@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = Field(...)
     OPENAI_API_KEY: str = Field(...)
     TRUSTED_PROXIES: list[str] = ["127.0.0.1"]
+    ADMIN_SECRET_KEY: str = Field(...)
 
     @model_validator(mode="before")
     @classmethod
@@ -31,6 +32,8 @@ class Settings(BaseSettings):
             raise ValueError("JWT_SECRET_KEY must be at least 32 characters long.")
         if len(self.SEMESTER_SALT_SECRET) < 32:
             raise ValueError("SEMESTER_SALT_SECRET must be at least 32 characters long.")
+        if len(self.ADMIN_SECRET_KEY) < 32:
+            raise ValueError("ADMIN_SECRET_KEY must be at least 32 characters long.")
         return self
 
 settings = Settings()

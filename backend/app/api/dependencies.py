@@ -42,3 +42,28 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: AsyncSe
         raise credentials_exception
 
     return hmac_token
+
+from app.models.moderator import Moderator
+from app.core.hmac_identity import get_current_semester
+
+async def get_moderator(
+    hmac_token: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> str:
+    semester = get_current_semester()
+
+    stmt = select(Moderator).where(
+        Moderator.hmac_token == hmac_token,
+        Moderator.semester == semester,
+        Moderator.is_active == True,
+    )
+    result = await session.execute(stmt)
+    moderator = result.scalar_one_or_none()
+
+    if not moderator:
+        raise HTTPException(
+            status_code=403,
+            detail="Moderator access required"
+        )
+
+    return hmac_token

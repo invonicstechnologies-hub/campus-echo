@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
-from app.schemas.auth import RegisterRequest, OTPVerifyRequest, TokenResponse
-from app.services.auth_service import generate_and_send_otp, verify_otp_and_login
+from app.schemas.auth import RegisterRequest, OTPVerifyRequest, TokenResponse, AuthSuccessResponse
+from app.services.auth_service import verify_otp_and_login
+from app.utils.email import send_otp_email
+import hashlib
+import secrets
 from app.api.dependencies import get_current_user
 from jose import jwt
 from datetime import datetime, timedelta
@@ -12,12 +15,23 @@ import redis.asyncio as redis
 router = APIRouter(prefix="/auth", tags=["auth"])
 redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
-@router.post("/register", response_model=dict)
-async def register(request: RegisterRequest):
-    await generate_and_send_otp(request.email)
-    return {"message": "OTP sent successfully"}
+@router.post("/send-otp", response_model=AuthSuccessResponse)
+async def send_otp(request: RegisterRequest):
+    email_hash = hashlib.sha256(request.email.encode('utf-8')).hexdigest()
+    redis_key = f"otp:{email_hash}"
 
-@router.post("/verify-otp", response_model=TokenResponse)
+    ttl = await redis_client.ttl(redis_key)
+    if ttl > 0:
+        raise HTTPException(status_code=429, detail="OTP already sent, please wait before retrying")
+
+    otp = "".join(secrets.choice("0123456789") for _ in range(6))
+    
+    await redis_client.setex(redis_key, 600, otp)
+    send_otp_email(request.email, otp)
+    
+    return {"message": "OTP sent"}
+
+@router.post("/verify-otp", response_model=AuthSuccessResponse)
 async def verify_otp(request: OTPVerifyRequest, session: AsyncSession = Depends(get_db)):
     hmac_token = await verify_otp_and_login(request.email, request.otp, session)
     del request
@@ -33,8 +47,8 @@ async def verify_otp(request: OTPVerifyRequest, session: AsyncSession = Depends(
     
     return TokenResponse(access_token=access_token, token_type="bearer")
 
-@router.post("/refresh", response_model=TokenResponse)
-async def refresh(hmac_token: str = Depends(get_current_user)):
+@router.post("/refresh", response_model=AuthSuccessResponse)
+async def refresh(response: Response, hmac_token: str = Depends(get_current_user)):
     exp = datetime.utcnow() + timedelta(days=30)
     access_token = jwt.encode(
         {"sub": hmac_token, "exp": exp.timestamp()},
@@ -42,9 +56,21 @@ async def refresh(hmac_token: str = Depends(get_current_user)):
         algorithm="HS256"
     )
     await redis_client.expire(f"session:{hmac_token}", 30*86400)
-    return TokenResponse(access_token=access_token, token_type="bearer")
 
-@router.post("/logout", response_model=dict)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=settings.COOKIE_SECURE,
+        samesite="strict",
+        domain=settings.COOKIE_DOMAIN,
+        max_age=30*86400,
+        path="/",
+    )
+
+    return {"message": "Token refreshed"}
+
+@router.post("/logout", response_model=AuthSuccessResponse)
 async def logout(hmac_token: str = Depends(get_current_user)):
     await redis_client.delete(f"session:{hmac_token}")
     return {"message": "Logged out successfully"}

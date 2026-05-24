@@ -7,3 +7,4 @@ from app.models.flag import Flag
 from app.models.petition import Petition
 from app.models.petition_signature import PetitionSignature
 from app.models.moderation_log import ModerationLog
+from app.models.moderator import Moderator

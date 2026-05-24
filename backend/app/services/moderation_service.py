@@ -44,7 +44,7 @@ async def flag_post(session: AsyncSession, post_id: uuid.UUID, reason: str, hmac
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Already flagged")
 
-async def action_post(session: AsyncSession, post_id: uuid.UUID, action: str, moderator_hmac: str) -> dict:
+async def action_post(session: AsyncSession, post_id: uuid.UUID, action: str, moderator_hmac_token: str) -> dict:
     try:
         async with session.begin():
             post = await session.get(Post, post_id)
@@ -59,7 +59,7 @@ async def action_post(session: AsyncSession, post_id: uuid.UUID, action: str, mo
             log = ModerationLog(
                 action=action,
                 post_id=post_id,
-                moderator_hmac=moderator_hmac,
+                moderator_hmac_token=moderator_hmac_token,
                 reason="Moderator action"
             )
             session.add(log)

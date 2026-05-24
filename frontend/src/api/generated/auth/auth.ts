@@ -15,12 +15,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AuthSuccessResponse,
   HTTPValidationError,
-  LogoutAuthLogoutPost200,
   OTPVerifyRequest,
-  RegisterAuthRegisterPost200,
-  RegisterRequest,
-  TokenResponse
+  RegisterRequest
 } from '../model';
 
 import { customFetch } from '../../client';
@@ -30,39 +28,39 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
-export type registerAuthRegisterPostResponse200 = {
-  data: RegisterAuthRegisterPost200
+export type sendOtpAuthSendOtpPostResponse200 = {
+  data: AuthSuccessResponse
   status: 200
 }
 
-export type registerAuthRegisterPostResponse422 = {
+export type sendOtpAuthSendOtpPostResponse422 = {
   data: HTTPValidationError
   status: 422
 }
 
-export type registerAuthRegisterPostResponseSuccess = (registerAuthRegisterPostResponse200) & {
+export type sendOtpAuthSendOtpPostResponseSuccess = (sendOtpAuthSendOtpPostResponse200) & {
   headers: Headers;
 };
-export type registerAuthRegisterPostResponseError = (registerAuthRegisterPostResponse422) & {
+export type sendOtpAuthSendOtpPostResponseError = (sendOtpAuthSendOtpPostResponse422) & {
   headers: Headers;
 };
 
-export type registerAuthRegisterPostResponse = (registerAuthRegisterPostResponseSuccess | registerAuthRegisterPostResponseError)
+export type sendOtpAuthSendOtpPostResponse = (sendOtpAuthSendOtpPostResponseSuccess | sendOtpAuthSendOtpPostResponseError)
 
-export const getRegisterAuthRegisterPostUrl = () => {
-
-
+export const getSendOtpAuthSendOtpPostUrl = () => {
 
 
-  return `/auth/register`
+
+
+  return `/auth/send-otp`
 }
 
 /**
- * @summary Register
+ * @summary Send Otp
  */
-export const registerAuthRegisterPost = async (registerRequest: RegisterRequest, options?: RequestInit): Promise<registerAuthRegisterPostResponse> => {
+export const sendOtpAuthSendOtpPost = async (registerRequest: RegisterRequest, options?: RequestInit): Promise<sendOtpAuthSendOtpPostResponse> => {
 
-  return customFetch<registerAuthRegisterPostResponse>(getRegisterAuthRegisterPostUrl(),
+  return customFetch<sendOtpAuthSendOtpPostResponse>(getSendOtpAuthSendOtpPostUrl(),
   {
     ...options,
     method: 'POST',
@@ -74,11 +72,11 @@ export const registerAuthRegisterPost = async (registerRequest: RegisterRequest,
 
 
 
-export const getRegisterAuthRegisterPostMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAuthRegisterPost>>, TError,{data: RegisterRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof registerAuthRegisterPost>>, TError,{data: RegisterRequest}, TContext> => {
+export const getSendOtpAuthSendOtpPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendOtpAuthSendOtpPost>>, TError,{data: RegisterRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendOtpAuthSendOtpPost>>, TError,{data: RegisterRequest}, TContext> => {
 
-const mutationKey = ['registerAuthRegisterPost'];
+const mutationKey = ['sendOtpAuthSendOtpPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -88,10 +86,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerAuthRegisterPost>>, {data: RegisterRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendOtpAuthSendOtpPost>>, {data: RegisterRequest}> = (props) => {
           const {data} = props ?? {};
 
-          return  registerAuthRegisterPost(data,requestOptions)
+          return  sendOtpAuthSendOtpPost(data,requestOptions)
         }
 
 
@@ -101,25 +99,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RegisterAuthRegisterPostMutationResult = NonNullable<Awaited<ReturnType<typeof registerAuthRegisterPost>>>
-    export type RegisterAuthRegisterPostMutationBody = RegisterRequest
-    export type RegisterAuthRegisterPostMutationError = HTTPValidationError
+    export type SendOtpAuthSendOtpPostMutationResult = NonNullable<Awaited<ReturnType<typeof sendOtpAuthSendOtpPost>>>
+    export type SendOtpAuthSendOtpPostMutationBody = RegisterRequest
+    export type SendOtpAuthSendOtpPostMutationError = HTTPValidationError
 
     /**
- * @summary Register
+ * @summary Send Otp
  */
-export const useRegisterAuthRegisterPost = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAuthRegisterPost>>, TError,{data: RegisterRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
+export const useSendOtpAuthSendOtpPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendOtpAuthSendOtpPost>>, TError,{data: RegisterRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof registerAuthRegisterPost>>,
+        Awaited<ReturnType<typeof sendOtpAuthSendOtpPost>>,
         TError,
         {data: RegisterRequest},
         TContext
       > => {
-      return useMutation(getRegisterAuthRegisterPostMutationOptions(options), queryClient);
+      return useMutation(getSendOtpAuthSendOtpPostMutationOptions(options), queryClient);
     }
     export type verifyOtpAuthVerifyOtpPostResponse200 = {
-  data: TokenResponse
+  data: AuthSuccessResponse
   status: 200
 }
 
@@ -207,7 +205,7 @@ export const useVerifyOtpAuthVerifyOtpPost = <TError = HTTPValidationError,
       return useMutation(getVerifyOtpAuthVerifyOtpPostMutationOptions(options), queryClient);
     }
     export type refreshAuthRefreshPostResponse200 = {
-  data: TokenResponse
+  data: AuthSuccessResponse
   status: 200
 }
 
@@ -288,7 +286,7 @@ export const useRefreshAuthRefreshPost = <TError = unknown,
       return useMutation(getRefreshAuthRefreshPostMutationOptions(options), queryClient);
     }
     export type logoutAuthLogoutPostResponse200 = {
-  data: LogoutAuthLogoutPost200
+  data: AuthSuccessResponse
   status: 200
 }
 
