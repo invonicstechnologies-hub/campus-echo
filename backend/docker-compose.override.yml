@@ -1,0 +1,7 @@
+services:
+  backend:
+    volumes:
+      - .:/app
+  celery_worker:
+    volumes:
+      - .:/app
