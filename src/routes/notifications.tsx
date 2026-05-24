@@ -53,7 +53,7 @@ function NotificationsPage() {
                   <p className="mt-0.5 line-clamp-1 text-[12px] text-muted-foreground">on "{post.title}"</p>
                 )}
               </div>
-              <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{relativeTime(n.createdAt)}</span>
+              <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{relativeTime(n.ageMinutes)}</span>
             </Link>
           );
         })}

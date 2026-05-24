@@ -38,7 +38,7 @@ export function PostCard({ post, index = 0 }: Props) {
             <span className="text-muted-foreground/60">·</span>
             <span className="truncate">{post.community}</span>
             <span className="text-muted-foreground/60">·</span>
-            <span className="shrink-0 tabular-nums">{relativeTime(post.createdAt)}</span>
+            <span className="shrink-0 tabular-nums">{relativeTime(post.ageMinutes)}</span>
           </div>
           {post.trending && (
             <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-flame/10 px-2 py-0.5 text-[11px] font-medium text-flame ring-1 ring-flame/25">

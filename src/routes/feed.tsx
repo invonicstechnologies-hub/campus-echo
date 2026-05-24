@@ -26,7 +26,7 @@ const tabs = [
 function FeedPage() {
   const [tab, setTab] = useState("hot");
   const visible = useMemo(() => {
-    if (tab === "new") return [...posts].sort((a, b) => b.createdAt - a.createdAt);
+    if (tab === "new") return [...posts].sort((a, b) => a.ageMinutes - b.ageMinutes);
     if (tab === "trending") return posts.filter(p => p.trending);
     if (tab === "confessions") return posts.filter(p => p.community === "confessions");
     if (tab === "rants") return posts.filter(p => p.community === "rants");

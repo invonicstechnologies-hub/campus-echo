@@ -58,7 +58,7 @@ function PostDetail() {
           <AnonAvatar seed={post.authorSeed} size={32} />
           <div className="flex min-w-0 flex-col">
             <span className="font-medium text-foreground/90">{alias}</span>
-            <span>{post.community} · {relativeTime(post.createdAt)}</span>
+            <span>{post.community} · {relativeTime(post.ageMinutes)}</span>
           </div>
         </header>
         <h1 className="mt-3 text-[22px] font-semibold leading-tight tracking-[-0.015em] text-foreground text-pretty">

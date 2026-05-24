@@ -49,7 +49,7 @@ function CommentItem({ node, depth }: { node: Node; depth: number }) {
           <div className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
             <span className="font-medium text-foreground/90">{alias}</span>
             <span className="text-muted-foreground/60">·</span>
-            <span className="tabular-nums">{relativeTime(node.createdAt)}</span>
+            <span className="tabular-nums">{relativeTime(node.ageMinutes)}</span>
             <button
               onClick={() => setCollapsed(v => !v)}
               className="ml-auto grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground tap"
