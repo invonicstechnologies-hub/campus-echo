@@ -17,12 +17,13 @@ export function TopBar() {
 
         <div className="flex-1" />
 
-        <button
+        <Link
+          to="/search"
           aria-label="Search"
           className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:text-foreground hover:bg-accent tap"
         >
           <Search className="h-[18px] w-[18px]" />
-        </button>
+        </Link>
         <Link
           to="/notifications"
           aria-label="Notifications"
