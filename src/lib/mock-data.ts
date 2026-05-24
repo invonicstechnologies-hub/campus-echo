@@ -12,7 +12,7 @@ export type Post = {
   community: string;
   title: string;
   body: string;
-  createdAt: number;
+  ageMinutes: number;
   upvotes: number;
   downvotes: number;
   comments: number;
@@ -27,7 +27,7 @@ export type Comment = {
   parentId?: string;
   authorSeed: string;
   body: string;
-  createdAt: number;
+  ageMinutes: number;
   upvotes: number;
 };
 
