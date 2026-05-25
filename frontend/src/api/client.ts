@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
-const CSRF_HEADER_NAME = import.meta.env.VITE_CSRF_HEADER_NAME ?? 'X-Campus-Echo-Client';
+const CSRF_HEADER_NAME = import.meta.env.VITE_CSRF_HEADER_NAME ?? 'X-Unsaid-Client';
 const CSRF_HEADER_VALUE = import.meta.env.VITE_CSRF_HEADER_VALUE ?? '';
 
 const STATE_CHANGING_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);

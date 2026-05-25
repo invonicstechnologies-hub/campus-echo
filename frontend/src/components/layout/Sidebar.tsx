@@ -22,7 +22,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-6 border-b border-border">
-        <h1 className="text-xl font-bold tracking-tight text-primary">Campus Echo</h1>
+        <h1 className="text-xl font-bold tracking-tight text-primary">Unsaid</h1>
       </div>
       <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
         {navItems.map((item) => {

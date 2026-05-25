@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     SMTP_PORT: int = Field(...)
     SMTP_USER: str = Field(...)
     SMTP_PASSWORD: str = Field(...)
+    GMAIL_SENDER: str = Field(...)
+    GMAIL_APP_PASSWORD: str = Field(...)
     OPENAI_API_KEY: str = Field(...)
     TRUSTED_PROXIES: list[str] = ["127.0.0.1"]
     ADMIN_SECRET_KEY: str = Field(...)

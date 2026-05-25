@@ -4,7 +4,7 @@ from app.api.routes import auth, posts, petitions, flags, moderation, admin
 from app.middleware.request_id import RequestIDMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
 
-app = FastAPI(title="Campus Echo API")
+app = FastAPI(title="Unsaid API")
 
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(RequestIDMiddleware)

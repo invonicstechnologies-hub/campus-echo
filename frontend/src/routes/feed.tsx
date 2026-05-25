@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AppShell } from "@/components/layout/AppShell";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { FeedTabs } from "@/components/feed/FeedTabs";
 import { PostCard } from "@/components/feed/PostCard";
-import { posts } from "@/lib/mock-data";
+import { useGetPostsPostsGet } from "@/api/generated/posts/posts";
+import { FeedSkeleton } from "@/components/feed/FeedSkeleton";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -25,20 +26,27 @@ const tabs = [
 
 function FeedPage() {
   const [tab, setTab] = useState("hot");
+  const { data, isLoading } = useGetPostsPostsGet();
+
   const visible = useMemo(() => {
-    if (tab === "new") return [...posts].sort((a, b) => a.ageMinutes - b.ageMinutes);
-    if (tab === "trending") return posts.filter(p => p.trending);
-    if (tab === "confessions") return posts.filter(p => p.community === "confessions");
-    if (tab === "rants") return posts.filter(p => p.community === "rants");
-    return [...posts].sort((a, b) => (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes));
-  }, [tab]);
+    if (!data?.data?.posts) return [];
+    const posts = data.data.posts;
+    
+    if (tab === "new") return [...posts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    if (tab === "hot") return [...posts].sort((a, b) => b.upvote_count - a.upvote_count);
+    return posts;
+  }, [data, tab]);
 
   return (
-    <AppShell>
+    <AppLayout>
       <FeedTabs tabs={tabs} active={tab} onChange={setTab} />
-      <div className="flex flex-col gap-2.5">
-        {visible.map((p, i) => <PostCard key={p.id} post={p} index={i} />)}
+      <div className="flex flex-col gap-2.5 mt-4">
+        {isLoading ? (
+          <FeedSkeleton />
+        ) : (
+          visible.map((p) => <PostCard key={p.id} post={p} />)
+        )}
       </div>
-    </AppShell>
+    </AppLayout>
   );
 }

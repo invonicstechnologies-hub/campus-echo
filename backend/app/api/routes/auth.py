@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete
 from app.db.session import get_db
 from app.models.session_token import SessionToken
 from app.schemas.auth import RegisterRequest, OTPVerifyRequest, TokenResponse, AuthSuccessResponse
 from app.services.auth_service import verify_otp_and_login
-from app.utils.email import send_otp_email
+from app.utils.email import send_otp_email_sync
 import hashlib
 import secrets
 from app.api.dependencies import get_current_user
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
 @router.post("/send-otp", response_model=AuthSuccessResponse)
-async def send_otp(request: RegisterRequest):
+async def send_otp(request: RegisterRequest, background_tasks: BackgroundTasks):
     email_hash = hashlib.sha256(request.email.encode('utf-8')).hexdigest()
     redis_key = f"otp:{email_hash}"
 
@@ -29,7 +29,7 @@ async def send_otp(request: RegisterRequest):
     otp = "".join(secrets.choice("0123456789") for _ in range(6))
     
     await redis_client.setex(redis_key, 600, otp)
-    send_otp_email(request.email, otp)
+    background_tasks.add_task(send_otp_email_sync, request.email, otp)
     
     return {"message": "OTP sent"}
 
