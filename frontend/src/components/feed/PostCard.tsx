@@ -1,76 +1,94 @@
-import { Link } from "@tanstack/react-router";
-import { Flame } from "lucide-react";
-import { motion } from "motion/react";
-import { AnonAvatar } from "@/components/profile/AnonAvatar";
-import { ReactionBar } from "./ReactionBar";
-import { aliasFromSeed } from "@/lib/anon";
-import { relativeTime } from "@/lib/format";
-import type { Post } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import { ArrowBigUp, Flag, MessageSquare, MoreHorizontal } from 'lucide-react';
+import type { PostResponse } from '../../api/generated/model';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-type Props = { post: Post; index?: number };
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
-const tagColor: Record<NonNullable<Post["tag"]>, string> = {
-  confession: "text-primary",
-  opinion: "text-flame",
-  question: "text-down",
-  rant: "text-foreground",
-};
+interface PostCardProps {
+  post: PostResponse;
+  onUpvote?: (id: string) => void;
+  onFlag?: (id: string) => void;
+}
 
-export function PostCard({ post, index = 0 }: Props) {
-  const alias = aliasFromSeed(post.authorSeed);
+export function PostCard({ post, onUpvote, onFlag }: PostCardProps) {
+  const formattedDate = new Date(post.created_at).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric'
+  });
+
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: Math.min(index * 0.04, 0.2) }}
-      className="group relative"
-    >
-      <Link
-        to="/post/$id"
-        params={{ id: post.id }}
-        className="block rounded-xl bg-card p-4 ring-1 ring-border transition-colors hover:ring-border-strong"
-      >
-        <header className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
-          <AnonAvatar seed={post.authorSeed} size={28} />
-          <div className="flex min-w-0 items-center gap-1.5">
-            <span className="truncate font-medium text-foreground/90">{alias}</span>
-            <span className="text-muted-foreground/60">·</span>
-            <span className="truncate">{post.community}</span>
-            <span className="text-muted-foreground/60">·</span>
-            <span className="shrink-0 tabular-nums">{relativeTime(post.ageMinutes)}</span>
+    <article className="bg-card text-card-foreground p-4 mb-2 md:mb-4 md:rounded-2xl border-y md:border border-border">
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <UserIcon className="w-5 h-5 text-muted-foreground" />
           </div>
-          {post.trending && (
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-flame/10 px-2 py-0.5 text-[11px] font-medium text-flame ring-1 ring-flame/25">
-              <Flame className="h-3 w-3" />
-              Trending
-            </span>
-          )}
-        </header>
-
-        <h2 className="mt-3 text-[17px] font-semibold leading-snug tracking-[-0.01em] text-foreground text-pretty">
-          {post.title}
-        </h2>
-        <p className="mt-1.5 line-clamp-3 text-[14.5px] leading-relaxed text-muted-foreground text-pretty">
-          {post.body}
-        </p>
-
-        {post.tag && (
-          <div className="mt-3">
-            <span className={cn("text-[11px] font-semibold uppercase tracking-[0.12em]", tagColor[post.tag])}>
-              · {post.tag}
-            </span>
+          <div>
+            <div className="font-semibold text-sm">Anonymous</div>
+            <div className="text-xs text-muted-foreground">{formattedDate}</div>
           </div>
-        )}
-
-        <div className="mt-3">
-          <ReactionBar
-            initialScore={post.upvotes - post.downvotes}
-            comments={post.comments}
-            reposts={post.reposts}
-          />
         </div>
-      </Link>
-    </motion.article>
+        
+        <button className="p-3 -mr-3 -mt-2 text-muted-foreground hover:bg-accent rounded-full transition-colors active:scale-95">
+          <MoreHorizontal className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="mb-4 text-base whitespace-pre-wrap break-words leading-relaxed px-1">
+        {post.content}
+      </div>
+
+      <div className="flex items-center justify-between text-muted-foreground border-t border-border/50 pt-2">
+        <div className="flex items-center gap-4">
+          {/* Large touch targets for mobile */}
+          <button 
+            onClick={() => onUpvote?.(post.id)}
+            className="flex items-center gap-2 group p-2 rounded-xl hover:bg-primary/10 transition-colors active:scale-95"
+          >
+            <ArrowBigUp className="w-6 h-6 group-hover:text-primary transition-colors" />
+            <span className="text-sm font-medium group-hover:text-primary transition-colors">
+              {post.upvotes}
+            </span>
+          </button>
+          
+          <button className="flex items-center gap-2 group p-2 rounded-xl hover:bg-blue-500/10 transition-colors active:scale-95">
+            <MessageSquare className="w-5 h-5 group-hover:text-blue-500 transition-colors" />
+            <span className="text-sm font-medium group-hover:text-blue-500 transition-colors">
+              Reply
+            </span>
+          </button>
+        </div>
+
+        <button 
+          onClick={() => onFlag?.(post.id)}
+          className="p-3 -mr-3 hover:bg-destructive/10 rounded-xl transition-colors group active:scale-95"
+        >
+          <Flag className="w-5 h-5 group-hover:text-destructive transition-colors" />
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function UserIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
   );
 }

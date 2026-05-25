@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import model_validator, Field
 
 class Settings(BaseSettings):
-    ENVIRONMENT: Literal["dev", "staging", "prod"] = "dev"
+    ENVIRONMENT: Literal["dev", "staging", "prod"] = "prod"
     DATABASE_URL: str = Field(...)
     REDIS_URL: str = Field(...)
     JWT_SECRET_KEY: str = Field(...)
@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = Field(...)
     TRUSTED_PROXIES: list[str] = ["127.0.0.1"]
     ADMIN_SECRET_KEY: str = Field(...)
+    CSRF_HEADER_NAME: str = Field(...)
+    CSRF_HEADER_VALUE: str = Field(...)
 
     @model_validator(mode="before")
     @classmethod
@@ -34,6 +36,8 @@ class Settings(BaseSettings):
             raise ValueError("SEMESTER_SALT_SECRET must be at least 32 characters long.")
         if len(self.ADMIN_SECRET_KEY) < 32:
             raise ValueError("ADMIN_SECRET_KEY must be at least 32 characters long.")
+        if len(self.CSRF_HEADER_VALUE) < 32:
+            raise ValueError("CSRF_HEADER_VALUE must be at least 32 characters long.")
         return self
 
 settings = Settings()

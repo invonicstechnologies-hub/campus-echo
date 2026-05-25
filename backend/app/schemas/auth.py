@@ -26,7 +26,7 @@ class RegisterRequest(BaseModel):
 
 class OTPVerifyRequest(BaseModel):
     email: str
-    otp: str
+    otp: str = Field(..., min_length=6, max_length=6, pattern=r"^\d{6}$")
 
     @field_validator('email')
     @classmethod

@@ -3,13 +3,23 @@ import hashlib
 from datetime import datetime
 from app.core.config import settings
 
-def get_current_semester_salt() -> str:
-    """Derive salt from current academic semester (e.g. '2025-S1')."""
+def get_current_semester() -> str:
     now = datetime.utcnow()
     year = now.year
-    # S1 is Jan-Jun, S2 is Jul-Dec, as an example mapping
     semester = "S1" if now.month <= 6 else "S2"
-    semester_string = f"{year}-{semester}"
+    period = f"{year}-{semester}"
+    
+    signature = hmac.new(
+        settings.SEMESTER_SALT_SECRET.encode('utf-8'),
+        period.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()[:8]
+    
+    return f"{period}-{signature}"
+
+def get_current_semester_salt() -> str:
+    """Derive salt from current academic semester (e.g. '2025-S1')."""
+    semester_string = get_current_semester()
     
     # Combine base secret with semester string and hash it
     base_secret = settings.SEMESTER_SALT_SECRET.encode('utf-8')

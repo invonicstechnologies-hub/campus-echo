@@ -50,11 +50,25 @@ async def action_post(session: AsyncSession, post_id: uuid.UUID, action: str, mo
             post = await session.get(Post, post_id)
             if not post:
                 raise HTTPException(status_code=404, detail="Post not found")
+
+            valid_transitions = {
+                'remove': ['published', 'under_review', 'flagged', 'restored'],
+                'restore': ['removed', 'under_review', 'flagged'],
+                'escalate': ['under_review', 'flagged'],
+            }
+
+            if post.status not in valid_transitions.get(action, []):
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Cannot {action} a post with status '{post.status}'"
+                )
                 
             if action == 'remove':
                 post.status = 'removed'
             elif action == 'restore':
                 post.status = 'restored'
+            elif action == 'escalate':
+                post.status = 'under_review'
                 
             log = ModerationLog(
                 action=action,
