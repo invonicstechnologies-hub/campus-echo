@@ -51,12 +51,13 @@ async def verify_otp(
 
     await redis_client.setex(f"session:{hmac_token}", 30 * 86400, "active")
 
+    # TODO: Revert to samesite="strict" once frontend and backend share the same custom root domain (e.g., unsaid.co.ke)
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=settings.COOKIE_SECURE,
-        samesite="strict",
+        secure=True,
+        samesite="none",
         domain=settings.COOKIE_DOMAIN,
         max_age=30 * 86400,
         path="/",
@@ -74,12 +75,13 @@ async def refresh(response: Response, hmac_token: str = Depends(get_current_user
     )
     await redis_client.expire(f"session:{hmac_token}", 30*86400)
 
+    # TODO: Revert to samesite="strict" once frontend and backend share the same custom root domain (e.g., unsaid.co.ke)
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=settings.COOKIE_SECURE,
-        samesite="strict",
+        secure=True,
+        samesite="none",
         domain=settings.COOKIE_DOMAIN,
         max_age=30*86400,
         path="/",
@@ -105,6 +107,8 @@ async def logout(
         key="access_token",
         domain=settings.COOKIE_DOMAIN,
         path="/",
+        secure=True,
+        samesite="none",
     )
 
     return AuthSuccessResponse(message="Logged out")
