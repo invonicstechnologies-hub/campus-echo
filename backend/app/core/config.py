@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     GMAIL_SENDER: str = Field(...)
     GMAIL_APP_PASSWORD: str = Field(...)
     OPENAI_API_KEY: str = Field(...)
-    TRUSTED_PROXIES: list[str] = ["127.0.0.1"]
-    ALLOWED_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    TRUSTED_PROXIES: list[str] | str = ["127.0.0.1"]
+    ALLOWED_ORIGINS: list[str] | str = ["http://localhost:5173", "http://localhost:3000"]
     ADMIN_SECRET_KEY: str = Field(...)
     CSRF_HEADER_NAME: str = Field(...)
     CSRF_HEADER_VALUE: str = Field(...)
