@@ -25,7 +25,13 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 target_metadata = Base.metadata
 
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+import os
+
+database_url = os.getenv("DATABASE_URL", settings.DATABASE_URL)
+if database_url and database_url.startswith("postgresql://"):
+    database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+config.set_main_option("sqlalchemy.url", database_url)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""

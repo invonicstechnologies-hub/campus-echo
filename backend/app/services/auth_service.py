@@ -9,22 +9,8 @@ import redis.asyncio as redis
 from app.core.config import settings
 from app.core.hmac_identity import sever_identity
 from app.models.session_token import SessionToken
-from app.utils.email import send_otp_email
-
 redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
-async def generate_and_send_otp(email: str) -> None:
-    email_hash = hashlib.sha256(email.encode('utf-8')).hexdigest()
-    redis_key = f"otp:{email_hash}"
-
-    ttl = await redis_client.ttl(redis_key)
-    if ttl > 0:
-        raise HTTPException(status_code=429, detail=f"OTP already sent. Retry in {ttl} seconds.")
-
-    otp = "".join(secrets.choice("0123456789") for _ in range(6))
-    
-    await redis_client.setex(redis_key, 600, otp)
-    send_otp_email(email, otp)
 
 async def verify_otp_and_login(email: str, otp: str, session: AsyncSession) -> str:
     email_hash = hashlib.sha256(email.encode('utf-8')).hexdigest()
