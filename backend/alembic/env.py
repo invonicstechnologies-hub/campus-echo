@@ -10,7 +10,6 @@ from alembic import context
 # Import models via app.db.base
 from app.db.base import Base
 import app.models
-from app.core.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -28,7 +27,9 @@ target_metadata = Base.metadata
 import os
 
 def get_async_url():
-    url = os.environ.get("DATABASE_URL", settings.DATABASE_URL)
+    url = os.environ.get("DATABASE_URL", "")
+    if not url:
+        raise RuntimeError("DATABASE_URL environment variable is not set")
     if url.startswith("postgresql://"):
         url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
     if url.startswith("postgres://"):
