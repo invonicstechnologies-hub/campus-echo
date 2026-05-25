@@ -7,14 +7,14 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function Sidebar() {
+export function Sidebar({ onCreatePost }: { onCreatePost?: () => void }) {
   const location = useLocation();
   const pathname = location.pathname;
 
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
+    { name: 'Home', path: '/feed', icon: Home },
     { name: 'Search', path: '/search', icon: Search },
-    { name: 'Post', path: '/post', icon: PenSquare },
+    { name: 'Post', path: '#', icon: PenSquare, action: onCreatePost },
     { name: 'Petitions', path: '/petitions', icon: Megaphone },
     { name: 'Profile', path: '/profile', icon: User },
   ];
@@ -27,6 +27,20 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
+          
+          if (item.action) {
+            return (
+              <button
+                key={item.name}
+                onClick={item.action}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-colors hover:bg-accent hover:text-accent-foreground text-muted-foreground"
+              >
+                <item.icon className="w-6 h-6" strokeWidth={2} />
+                <span className="text-base">{item.name}</span>
+              </button>
+            );
+          }
+
           return (
             <Link
               key={item.name}

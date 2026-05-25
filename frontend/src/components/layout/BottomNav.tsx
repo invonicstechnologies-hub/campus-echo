@@ -7,14 +7,14 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function BottomNav() {
+export function BottomNav({ onCreate }: { onCreate?: () => void }) {
   const location = useLocation();
   const pathname = location.pathname;
 
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
+    { name: 'Home', path: '/feed', icon: Home },
     { name: 'Search', path: '/search', icon: Search },
-    { name: 'Post', path: '/post', icon: PenSquare },
+    { name: 'Post', path: '#', icon: PenSquare, action: onCreate },
     { name: 'Profile', path: '/profile', icon: User },
   ];
 
@@ -23,13 +23,27 @@ export function BottomNav() {
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
+          
+          if (item.action) {
+            return (
+              <button
+                key={item.name}
+                onClick={item.action}
+                className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <item.icon className="w-6 h-6" strokeWidth={2} />
+                <span className="text-[10px]">{item.name}</span>
+              </button>
+            );
+          }
+
           return (
             <Link
               key={item.name}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground",
-                isActive && "text-primary font-medium"
+                "flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground transition-colors hover:text-foreground",
+                isActive && "text-primary font-medium hover:text-primary"
               )}
             >
               <item.icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 2} />
