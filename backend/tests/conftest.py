@@ -26,7 +26,8 @@ async def setup_test_db():
             pass
     await engine.dispose()
 
-    os.environ["DATABASE_URL"] = TEST_DB_URL
+    sync_test_url = TEST_DB_URL.replace("postgresql+asyncpg://", "postgresql://").replace("asyncpg+postgresql://", "postgresql://")
+    os.environ["DATABASE_URL"] = sync_test_url
     alembic_cfg = Config("alembic.ini")
     
     await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
