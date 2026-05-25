@@ -29,8 +29,8 @@ function FeedPage() {
   const { data, isLoading } = useGetPostsPostsGet();
 
   const visible = useMemo(() => {
-    if (!data?.data?.posts) return [];
-    const posts = data.data.posts;
+    if (!data?.posts) return [];
+    const posts = data.posts;
     
     if (tab === "new") return [...posts].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     if (tab === "hot") return [...posts].sort((a, b) => b.upvote_count - a.upvote_count);
