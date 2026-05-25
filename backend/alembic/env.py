@@ -27,21 +27,19 @@ target_metadata = Base.metadata
 
 import os
 
-database_url = os.getenv("DATABASE_URL", settings.DATABASE_URL)
-if database_url and database_url.startswith("postgresql://"):
-    database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-
-config.set_main_option("sqlalchemy.url", database_url)
-
-def get_sync_url():
-    url = os.environ.get("DATABASE_URL", "")
-    url = url.replace("postgresql+asyncpg://", "postgresql://")
-    url = url.replace("asyncpg+postgresql://", "postgresql://")
+def get_async_url():
+    url = os.environ.get("DATABASE_URL", settings.DATABASE_URL)
+    if url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
     return url
+
+config.set_main_option("sqlalchemy.url", get_async_url())
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
-    url = get_sync_url()
+    url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -75,7 +73,6 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    config.set_main_option("sqlalchemy.url", get_sync_url())
     asyncio.run(run_async_migrations())
 
 if context.is_offline_mode():
