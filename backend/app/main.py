@@ -10,15 +10,9 @@ app.add_middleware(RateLimitMiddleware)
 app.add_middleware(RequestIDMiddleware)
 from app.core.config import settings
 
-CORS_ORIGINS = {
-    "dev": ["http://localhost:5173", "http://localhost:3000"],
-    "staging": ["https://staging.campusecho.mku.ac.ke"],
-    "prod": ["https://campusecho.mku.ac.ke", "https://unsaid.sydneykamau2005.workers.dev"],
-}
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS.get(settings.ENVIRONMENT, []),
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],

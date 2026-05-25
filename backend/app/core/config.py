@@ -13,16 +13,22 @@ class Settings(BaseSettings):
     GMAIL_APP_PASSWORD: str = Field(...)
     OPENAI_API_KEY: str = Field(...)
     TRUSTED_PROXIES: list[str] = ["127.0.0.1"]
+    ALLOWED_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
     ADMIN_SECRET_KEY: str = Field(...)
     CSRF_HEADER_NAME: str = Field(...)
     CSRF_HEADER_VALUE: str = Field(...)
 
     @model_validator(mode="before")
     @classmethod
-    def parse_trusted_proxies(cls, data: dict) -> dict:
-        val = data.get("TRUSTED_PROXIES")
-        if isinstance(val, str):
-            data["TRUSTED_PROXIES"] = [ip.strip() for ip in val.split(",")]
+    def parse_comma_separated_lists(cls, data: dict) -> dict:
+        val_proxies = data.get("TRUSTED_PROXIES")
+        if isinstance(val_proxies, str):
+            data["TRUSTED_PROXIES"] = [ip.strip() for ip in val_proxies.split(",") if ip.strip()]
+            
+        val_origins = data.get("ALLOWED_ORIGINS")
+        if isinstance(val_origins, str):
+            data["ALLOWED_ORIGINS"] = [origin.strip() for origin in val_origins.split(",") if origin.strip()]
+            
         return data
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
