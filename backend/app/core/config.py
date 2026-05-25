@@ -9,8 +9,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = Field(...)
     SEMESTER_SALT_SECRET: str = Field(...)
 
-    GMAIL_SENDER: str = Field(...)
-    GMAIL_APP_PASSWORD: str = Field(...)
+    RESEND_API_KEY: str = Field(...)
     OPENAI_API_KEY: str = Field(...)
     TRUSTED_PROXIES: list[str] | str = ["127.0.0.1"]
     ALLOWED_ORIGINS: list[str] | str = ["http://localhost:5173", "http://localhost:3000"]

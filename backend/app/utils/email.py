@@ -1,20 +1,29 @@
-import smtplib
-from email.message import EmailMessage
+import httpx
 from app.core.config import settings
 
+
 def send_otp_email_sync(recipient_email: str, otp: str):
-    msg = EmailMessage()
-    msg.set_content(f"Your Unsaid verification code is: {otp}\n\nThis code expires in 10 minutes. Do not share it with anyone.")
-    msg["Subject"] = "Unsaid Verification Code"
-    msg["From"] = settings.GMAIL_SENDER
-    msg["To"] = recipient_email
+    payload = {
+        "from": "Unsaid <onboarding@resend.dev>",
+        "to": [recipient_email],
+        "subject": "Unsaid Verification Code",
+        "text": (
+            f"Your Unsaid verification code is: {otp}\n\n"
+            "This code expires in 10 minutes. Do not share it with anyone."
+        ),
+    }
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(settings.GMAIL_SENDER, settings.GMAIL_APP_PASSWORD)
-        server.send_message(msg)
-        server.quit()
-        print(f"OTP email sent to {recipient_email}")
+        response = httpx.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=10,
+        )
+        response.raise_for_status()
+        print(f"OTP email sent to {recipient_email} via Resend (id={response.json().get('id')})")
     except Exception as e:
         print(f"Failed to send OTP email to {recipient_email}: {e}")
