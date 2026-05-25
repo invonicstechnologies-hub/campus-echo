@@ -17,5 +17,8 @@ else
     echo "✅ Migrations complete"
 fi
 
+echo "🌱 Running database seed script..."
+python scripts/seed_initial_data.py
+
 echo "🌐 Starting uvicorn..."
 exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --workers 2 --loop uvloop
