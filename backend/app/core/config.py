@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     RESEND_API_KEY: str = Field(...)
     OPENAI_API_KEY: str = Field(...)
+    COOKIE_DOMAIN: str | None = None
     TRUSTED_PROXIES: list[str] | str = ["127.0.0.1"]
     ALLOWED_ORIGINS: list[str] | str = ["http://localhost:5173", "http://localhost:3000"]
     ADMIN_SECRET_KEY: str = Field(...)

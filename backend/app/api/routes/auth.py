@@ -58,7 +58,6 @@ async def verify_otp(
         httponly=True,
         secure=True,
         samesite="none",
-        domain=settings.COOKIE_DOMAIN,
         max_age=30 * 86400,
         path="/",
     )
@@ -82,7 +81,6 @@ async def refresh(response: Response, hmac_token: str = Depends(get_current_user
         httponly=True,
         secure=True,
         samesite="none",
-        domain=settings.COOKIE_DOMAIN,
         max_age=30*86400,
         path="/",
     )
@@ -105,7 +103,6 @@ async def logout(
 
     response.delete_cookie(
         key="access_token",
-        domain=settings.COOKIE_DOMAIN,
         path="/",
         secure=True,
         samesite="none",
