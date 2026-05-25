@@ -3,8 +3,12 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from app.core.config import settings
 
+db_url = settings.DATABASE_URL
+if db_url and db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    db_url,
     pool_pre_ping=True,
     pool_size=10,
     max_overflow=20,
