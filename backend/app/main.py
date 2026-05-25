@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import auth, posts, petitions, flags, moderation, admin
@@ -6,17 +7,20 @@ from app.middleware.rate_limit import RateLimitMiddleware
 
 app = FastAPI(title="Unsaid API")
 
-app.add_middleware(RateLimitMiddleware)
-app.add_middleware(RequestIDMiddleware)
-from app.core.config import settings
+# CORS must be added first so preflight OPTIONS requests are handled
+# before any other middleware inspects them
+allowed_origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(RequestIDMiddleware)
 
 app.include_router(auth.router)
 app.include_router(posts.router)
