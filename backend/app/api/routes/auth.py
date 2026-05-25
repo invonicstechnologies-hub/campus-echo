@@ -33,10 +33,9 @@ async def send_otp(request: RegisterRequest, background_tasks: BackgroundTasks):
     
     return {"message": "OTP sent"}
 
-@router.post("/verify-otp", response_model=AuthSuccessResponse)
+@router.post("/verify-otp", response_model=TokenResponse)
 async def verify_otp(
     request: OTPVerifyRequest,
-    response: Response,
     session: AsyncSession = Depends(get_db)
 ):
     hmac_token = await verify_otp_and_login(request.email, request.otp, session)
@@ -51,21 +50,10 @@ async def verify_otp(
 
     await redis_client.setex(f"session:{hmac_token}", 30 * 86400, "active")
 
-    # TODO: Revert to samesite="strict" once frontend and backend share the same custom root domain (e.g., unsaid.co.ke)
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=30 * 86400,
-        path="/",
-    )
+    return TokenResponse(access_token=access_token, token_type="bearer")
 
-    return AuthSuccessResponse(message="Authenticated")
-
-@router.post("/refresh", response_model=AuthSuccessResponse)
-async def refresh(response: Response, hmac_token: str = Depends(get_current_user)):
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh(hmac_token: str = Depends(get_current_user)):
     exp = datetime.utcnow() + timedelta(days=30)
     access_token = jwt.encode(
         {"sub": hmac_token, "exp": exp.timestamp()},
@@ -74,22 +62,10 @@ async def refresh(response: Response, hmac_token: str = Depends(get_current_user
     )
     await redis_client.expire(f"session:{hmac_token}", 30*86400)
 
-    # TODO: Revert to samesite="strict" once frontend and backend share the same custom root domain (e.g., unsaid.co.ke)
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=30*86400,
-        path="/",
-    )
-
-    return AuthSuccessResponse(message="Token refreshed")
+    return TokenResponse(access_token=access_token, token_type="bearer")
 
 @router.post("/logout", response_model=AuthSuccessResponse)
 async def logout(
-    response: Response,
     hmac_token: str = Depends(get_current_user),
     session: AsyncSession = Depends(get_db)
 ):
@@ -100,12 +76,5 @@ async def logout(
     )
     await session.execute(stmt)
     await session.commit()
-
-    response.delete_cookie(
-        key="access_token",
-        path="/",
-        secure=True,
-        samesite="none",
-    )
 
     return AuthSuccessResponse(message="Logged out")

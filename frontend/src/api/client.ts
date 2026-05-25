@@ -12,6 +12,11 @@ export async function customFetch<T>(
 
   const headers = new Headers(options.headers);
 
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
   // Attach CSRF header on all state-changing requests
   if (STATE_CHANGING_METHODS.has(method)) {
     headers.set(CSRF_HEADER_NAME, CSRF_HEADER_VALUE);
@@ -20,12 +25,13 @@ export async function customFetch<T>(
   const response = await fetch(`${API_BASE}${url}`, {
     ...options,
     headers,
-    credentials: 'include', // Always send httpOnly cookie
+    credentials: 'omit', // We use Bearer tokens now, no need to send cross-site cookies
   });
 
   if (!response.ok) {
     if (response.status === 401) {
       // Clear any local state and redirect to login
+      localStorage.removeItem('access_token');
       window.location.href = '/login';
       throw new Error('Unauthenticated');
     }

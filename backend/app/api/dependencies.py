@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import JWTError, jwt
 from app.core.config import settings
@@ -11,14 +12,16 @@ import redis.asyncio as aioredis
 
 
 redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/verify-otp")
 
 async def get_current_user(
-    access_token: str = Cookie(default=None),
+    access_token: str = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_db)
 ) -> str:
     credentials_exception = HTTPException(
         status_code=401,
         detail="Not authenticated",
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
     if not access_token:

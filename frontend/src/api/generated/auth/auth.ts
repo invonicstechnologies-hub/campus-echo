@@ -18,7 +18,8 @@ import type {
   AuthSuccessResponse,
   HTTPValidationError,
   OTPVerifyRequest,
-  RegisterRequest
+  RegisterRequest,
+  TokenResponse
 } from '../model';
 
 import { customFetch } from '../../client';
@@ -117,7 +118,7 @@ export const useSendOtpAuthSendOtpPost = <TError = HTTPValidationError,
       return useMutation(getSendOtpAuthSendOtpPostMutationOptions(options), queryClient);
     }
     export type verifyOtpAuthVerifyOtpPostResponse200 = {
-  data: AuthSuccessResponse
+  data: TokenResponse
   status: 200
 }
 
@@ -205,7 +206,7 @@ export const useVerifyOtpAuthVerifyOtpPost = <TError = HTTPValidationError,
       return useMutation(getVerifyOtpAuthVerifyOtpPostMutationOptions(options), queryClient);
     }
     export type refreshAuthRefreshPostResponse200 = {
-  data: AuthSuccessResponse
+  data: TokenResponse
   status: 200
 }
 

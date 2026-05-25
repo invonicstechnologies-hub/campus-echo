@@ -29,7 +29,10 @@ function RegisterPage() {
     e.preventDefault();
     verifyOtpMutation.mutate(
       { data: { email, otp } },
-      { onSuccess: () => nav({ to: "/feed" }) }
+      { onSuccess: (res: any) => {
+          localStorage.setItem("access_token", res.access_token);
+          nav({ to: "/feed" });
+      } }
     );
   };
 
